@@ -1,5 +1,6 @@
 import React, { Suspense, lazy, useEffect, useState } from "react";
 import logo from "./assets/logo.svg";
+import { setupAutoRefresh } from "./utils/auth";
 
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
@@ -7,8 +8,16 @@ const Login = lazy(() => import("./pages/Login"));
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // const []
+
   useEffect(() => {
-    const stored = sessionStorage.getItem("isLoggedIn");
+    if (isLoggedIn) {
+      setupAutoRefresh();
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("isLoggedIn");
     if (stored === "true") setIsLoggedIn(true);
   }, []);
 
