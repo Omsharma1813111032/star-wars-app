@@ -7,13 +7,13 @@ import Pagination from "../components/Pagination";
 import { useDebounce } from "../hooks/useDebounce";
 import CharacterSkeleton from "../components/CharacterSkeleton";
 
-export default function Home() {
+export default function Home({ search }) {
     const [characters, setCharacters] = useState([]);
     const [speciesList, setSpeciesList] = useState([]);
-    const [selectedSpecies, setSelectedSpecies] = useState("");
+    const [selectedSpecies, _] = useState("");
     const [count, setCount] = useState(0);
     const [page, setPage] = useState(1);
-    const [search, setSearch] = useState("");
+    // const [search] = useState("");
     const [selectedCharacter, setSelectedCharacter] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -108,9 +108,9 @@ export default function Home() {
 
     return (
         <div className="p-6 space-y-6">
-            <div className="flex flex-col md:flex-row items-center justify-end gap-4">
+            {/* <div className="flex flex-col md:flex-row items-center justify-end gap-4">
                 <SearchBar search={search} setSearch={setSearch} />
-            </div>
+            </div> */}
 
             {
                 !filtered.length ?

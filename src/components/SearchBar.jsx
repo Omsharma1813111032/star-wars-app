@@ -2,7 +2,7 @@ import { FaSearch } from "react-icons/fa";
 
 export default function SearchBar({ search, setSearch }) {
     return (
-        <div className="relative w-full md:w-1/3">
+        <div className="relative w-full">
             <FaSearch
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                 size={16}
