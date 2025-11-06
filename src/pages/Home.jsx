@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchPeople, fetchSpecies } from "../api/swapi";
+import { fetchAllSpecies, fetchPeople } from "../api/swapi";
 import CharacterCard from "../components/CharacterCard";
 import CharacterModal from "../components/CharacterModal";
 import SearchBar from "../components/SearchBar";
@@ -48,11 +48,14 @@ export default function Home() {
             setError("");
             try {
                 const peopleData = await fetchPeople(page, debouncedSearch);
-                const speciesData =
-                    speciesList.length === 0 ? await fetchSpecies() : { results: speciesList };
+                let allSpecies = speciesList;
+
+                if (speciesList.length === 0) {
+                    allSpecies = await fetchAllSpecies();
+                }
 
                 const speciesMap = {};
-                speciesData.results.forEach((sp) => (speciesMap[sp.url] = sp.name));
+                allSpecies.forEach((sp) => (speciesMap[sp.url] = sp.name));
 
                 const mappedPeople = peopleData.results.map((person) => ({
                     ...person,
@@ -60,7 +63,7 @@ export default function Home() {
                 }));
 
                 setCharacters(mappedPeople);
-                setSpeciesList(speciesData.results);
+                setSpeciesList(allSpecies);
                 setCount(peopleData.count);
             } catch (err) {
                 console.error(err);
@@ -69,8 +72,13 @@ export default function Home() {
                 setLoading(false);
             }
         }
+
         loadData();
     }, [page, debouncedSearch]);
+
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [page])
 
     const filtered =
         selectedSpecies && selectedSpecies !== ""

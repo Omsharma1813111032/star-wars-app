@@ -8,7 +8,7 @@ export default function Login({ onLogin }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (username === "StarWars" && password === "Wars@123") {
-            localStorage.setItem("isLoggedIn", "true");
+            sessionStorage.setItem("isLoggedIn", "true");
             onLogin();
         } 
         else {

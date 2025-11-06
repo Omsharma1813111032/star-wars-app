@@ -1,4 +1,3 @@
-// src/api/swapi.js
 const BASE_URL = "https://swapi.dev/api";
 
 /**
@@ -12,24 +11,35 @@ export async function fetchPeople(page = 1, search = "") {
 }
 
 /**
- * Fetch first page of species (for dropdown). If you want all species, implement pagination here.
+ * Fetch ALL species across all pages (SWAPI /species).
+ * This ensures we get all 37 species in one go.
  */
-export async function fetchSpeciesList() {
-    const res = await fetch(`${BASE_URL}/species/`);
-    if (!res.ok) throw new Error("Failed to fetch species list");
-    return await res.json();
+export async function fetchAllSpecies() {
+    let allSpecies = [];
+    let nextUrl = `${BASE_URL}/species/`;
+
+    while (nextUrl) {
+        const res = await fetch(nextUrl);
+        if (!res.ok) throw new Error("Failed to fetch species list");
+        const data = await res.json();
+        allSpecies = [...allSpecies, ...data.results];
+        nextUrl = data.next;
+    }
+
+    return allSpecies;
 }
 
 /**
- * Backwards-compatible alias: fetchSpecies -> fetchSpeciesList
+ * For backward compatibility — alias (can still use fetchSpecies or fetchSpeciesList)
  */
-export const fetchSpecies = fetchSpeciesList;
+export const fetchSpecies = fetchAllSpecies;
+export const fetchSpeciesList = fetchAllSpecies;
 
 /* ---------- species name cache/fetcher ---------- */
 const speciesNameCache = {};
 
 /**
- * Fetch species name by URL, with simple in-memory cache.
+ * Fetch species name by URL, with in-memory cache.
  * @param {string} url species URL from SWAPI
  * @returns {Promise<string>} species name
  */
@@ -44,7 +54,7 @@ export async function fetchSpeciesName(url) {
         speciesNameCache[url] = data.name || "Unknown";
         return speciesNameCache[url];
     } catch (err) {
-        console.log(err)
+        console.error("Error fetching species name:", err);
         speciesNameCache[url] = "Unknown";
         return "Unknown";
     }
