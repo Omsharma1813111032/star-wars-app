@@ -1,61 +1,70 @@
+// src/components/CharacterCard.jsx
 import React, { useEffect, useState } from "react";
 import { fetchSpeciesName } from "../api/swapi";
 import { getSpeciesColor } from "../utils/colorBySpecies";
 
 export default function CharacterCard({ character, onClick }) {
+    // Prefer pre-mapped species names (if Home mapped them into character.speciesNames)
     const initialSpeciesName =
-        (character.speciesNames && character.speciesNames[0]) ||
-        null;
+        (character.speciesNames && character.speciesNames[0]) || null;
 
     const [speciesName, setSpeciesName] = useState(initialSpeciesName || "Unknown");
-    const [bgClass, setBgClass] = useState(getSpeciesColor(initialSpeciesName || "Unknown"));
+    const [borderClass, setBorderClass] = useState(getSpeciesColor(initialSpeciesName || "Unknown"));
 
     useEffect(() => {
         let mounted = true;
         async function ensureSpeciesName() {
+            // If already have species name mapped, use it
             if (initialSpeciesName) {
                 setSpeciesName(initialSpeciesName);
-                setBgClass(getSpeciesColor(initialSpeciesName));
+                setBorderClass(getSpeciesColor(initialSpeciesName));
                 return;
             }
 
+            // else try fetching from species URL (character.species[0])
             if (character.species && character.species.length > 0) {
                 try {
                     const name = await fetchSpeciesName(character.species[0]);
                     if (!mounted) return;
                     setSpeciesName(name);
-                    setBgClass(getSpeciesColor(name));
+                    setBorderClass(getSpeciesColor(name));
                 } catch (err) {
-                    console.log(err)
+                    console.error("species fetch error:", err);
                     if (!mounted) return;
                     setSpeciesName("Unknown");
-                    setBgClass(getSpeciesColor("Unknown"));
+                    setBorderClass(getSpeciesColor("Unknown"));
                 }
             } else {
+                // no species url → assume Human (as SWAPI often uses empty)
                 const name = "Human";
                 setSpeciesName(name);
-                setBgClass(getSpeciesColor(name));
+                setBorderClass(getSpeciesColor(name));
             }
         }
 
         ensureSpeciesName();
-        return () => { mounted = false; };
-    }, [character]); 
+        return () => {
+            mounted = false;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [character]); // re-run if character changes
 
     const imageUrl = `https://picsum.photos/seed/${encodeURIComponent(character.name)}/300/200`;
 
     return (
         <div
             onClick={() => onClick(character)}
-            className={`${bgClass} p-3 rounded-xl hover:opacity-90 cursor-pointer transition-shadow shadow-md`}
+            className={`relative rounded-2xl p-4 cursor-pointer transform transition-all hover:scale-[1.03] hover:shadow-[0_0_20px_#ffe81f80] border-l-4 ${borderClass} bg-[#1a1a1a] hover:bg-[#1f1f1f]`}
         >
             <img
                 src={imageUrl}
                 alt={character.name}
-                className="rounded-md w-full h-40 object-cover mb-3"
+                className="rounded-lg w-full h-48 object-cover mb-3 border border-[#ffffff10]"
             />
-            <h2 className="text-lg font-semibold text-white">{character.name}</h2>
-            <p className="text-sm text-white/90">{speciesName}</p>
+            <h2 className="text-lg font-semibold text-[#ffe81f] drop-shadow-[0_0_6px_#000]">
+                {character.name}
+            </h2>
+            <p className="text-sm text-gray-300">{speciesName}</p>
         </div>
     );
 }

@@ -71,8 +71,9 @@ export default function Home() {
             : characters;
 
     return (
-        <div className="p-6">
-            <div className="flex flex-col md:flex-row items-center justify-between mb-4">
+        // no functional changes
+        <div className="p-6 space-y-6">
+            <div className="flex flex-col md:flex-row items-center justify-end gap-4">
                 <SearchBar search={search} setSearch={setSearch} />
                 {/* <FilterDropdown
                     speciesList={speciesList}
@@ -81,7 +82,7 @@ export default function Home() {
                 /> */}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {filtered.map((char) => (
                     <CharacterCard
                         key={char.name}
@@ -100,5 +101,6 @@ export default function Home() {
                 />
             )}
         </div>
+
     );
 }

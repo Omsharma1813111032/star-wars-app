@@ -3,7 +3,7 @@ export default function FilterDropdown({ speciesList, selected, setSelected }) {
         <select
             value={selected}
             onChange={(e) => setSelected(e.target.value)}
-            className="border border-gray-300 rounded-lg p-2 mb-4 ml-2"
+            className="bg-[#1a1a1a] border border-[#ffe81f40] text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#ffe81f] transition"
         >
             <option className="text-black" value="">All Species</option>
             {speciesList.map((sp) => (
