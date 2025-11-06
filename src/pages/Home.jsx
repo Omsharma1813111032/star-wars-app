@@ -3,9 +3,9 @@ import { fetchPeople, fetchSpecies } from "../api/swapi";
 import CharacterCard from "../components/CharacterCard";
 import CharacterModal from "../components/CharacterModal";
 import SearchBar from "../components/SearchBar";
-import FilterDropdown from "../components/FilterDropdown";
 import Pagination from "../components/Pagination";
 import { useDebounce } from "../hooks/useDebounce";
+import CharacterSkeleton from "../components/CharacterSkeleton";
 
 export default function Home() {
     const [characters, setCharacters] = useState([]);
@@ -15,9 +15,8 @@ export default function Home() {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
     const [selectedCharacter, setSelectedCharacter] = useState(null);
-
-    // console.log(selectedCharacter)
-
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
     const handleCharacterClick = async (character) => {
         try {
             let homeworldDetails = null;
@@ -41,26 +40,34 @@ export default function Home() {
             });
         }
     };
-
     const debouncedSearch = useDebounce(search, 500);
 
     useEffect(() => {
         async function loadData() {
-            const peopleData = await fetchPeople(page, debouncedSearch);
-            const speciesData =
-                speciesList.length === 0 ? await fetchSpecies() : { results: speciesList };
+            setLoading(true);
+            setError("");
+            try {
+                const peopleData = await fetchPeople(page, debouncedSearch);
+                const speciesData =
+                    speciesList.length === 0 ? await fetchSpecies() : { results: speciesList };
 
-            const speciesMap = {};
-            speciesData.results.forEach((sp) => (speciesMap[sp.url] = sp.name));
+                const speciesMap = {};
+                speciesData.results.forEach((sp) => (speciesMap[sp.url] = sp.name));
 
-            const mappedPeople = peopleData.results.map((person) => ({
-                ...person,
-                speciesNames: person.species.map((url) => speciesMap[url] || "Unknown"),
-            }));
+                const mappedPeople = peopleData.results.map((person) => ({
+                    ...person,
+                    speciesNames: person.species.map((url) => speciesMap[url] || "Unknown"),
+                }));
 
-            setCharacters(mappedPeople);
-            setSpeciesList(speciesData.results);
-            setCount(peopleData.count);
+                setCharacters(mappedPeople);
+                setSpeciesList(speciesData.results);
+                setCount(peopleData.count);
+            } catch (err) {
+                console.error(err);
+                setError("Failed to fetch data. Please try again later.");
+            } finally {
+                setLoading(false);
+            }
         }
         loadData();
     }, [page, debouncedSearch]);
@@ -70,29 +77,53 @@ export default function Home() {
             ? characters.filter((c) => c.speciesNames.includes(selectedSpecies))
             : characters;
 
+    if (loading)
+        return (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {Array.from({ length: 8 }).map((_, i) => (
+                    <CharacterSkeleton key={i} />
+                ))}
+            </div>
+        );
+
+    if (error)
+        return (
+            <div className="text-center text-red-400 mt-20 text-lg">{error}</div>
+        );
+
+    // if (!filtered.length)
+    //     return (
+    //         <div className="text-center text-gray-400 mt-20">
+    //             No characters found matching your search.
+    //         </div>
+    //     );
+
     return (
-        // no functional changes
         <div className="p-6 space-y-6">
             <div className="flex flex-col md:flex-row items-center justify-end gap-4">
                 <SearchBar search={search} setSearch={setSearch} />
-                {/* <FilterDropdown
-                    speciesList={speciesList}
-                    selected={selectedSpecies}
-                    setSelected={setSelectedSpecies}
-                /> */}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {filtered.map((char) => (
-                    <CharacterCard
-                        key={char.name}
-                        character={char}
-                        onClick={() => handleCharacterClick(char)}
-                    />
-                ))}
-            </div>
+            {
+                !filtered.length ?
+                    <div className="text-center text-gray-400 mt-20">
+                        No characters found matching your search.
+                    </div>
+                    :
+                    <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {filtered.map((char) => (
+                                <CharacterCard
+                                    key={char.name}
+                                    character={char}
+                                    onClick={() => handleCharacterClick(char)}
+                                />
+                            ))}
+                        </div>
 
-            <Pagination count={count} currentPage={page} setPage={setPage} />
+                        <Pagination count={count} currentPage={page} setPage={setPage} />
+                    </>
+            }
 
             {selectedCharacter && (
                 <CharacterModal
@@ -101,6 +132,5 @@ export default function Home() {
                 />
             )}
         </div>
-
     );
 }
