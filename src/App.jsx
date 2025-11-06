@@ -1,7 +1,7 @@
 import React, { Suspense, lazy, useEffect, useState } from "react";
 import logo from "./assets/logo.svg";
 import { setupAutoRefresh } from "./utils/auth";
-import SearchBar from "./components/SearchBar"; // ✅ import SearchBar here
+import SearchBar from "./components/SearchBar";
 import { IoLogOut } from "react-icons/io5";
 
 const Home = lazy(() => import("./pages/Home"));
@@ -11,9 +11,13 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [search, setSearch] = useState("");
 
+  console.log = () => { }
+  console.warn = () => { }
+  console.error = () => { }
+
   const handleLogout = () => {
     localStorage.clear()
-    window.location.reload(); // or redirect to login page
+    window.location.reload(); 
   };
 
 

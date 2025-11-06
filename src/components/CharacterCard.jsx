@@ -5,7 +5,6 @@ import { getSpeciesColor } from "../utils/colorBySpecies";
 
 export default function CharacterCard({ character, onClick }) {
     // console.log(character)
-    // Prefer pre-mapped species names (if Home mapped them into character.speciesNames)
     const initialSpeciesName =
         (character.speciesNames && character.speciesNames[0]) || null;
 

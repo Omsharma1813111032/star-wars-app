@@ -20,10 +20,10 @@ export default function Login({ onLogin }) {
         <div className="flex flex-col items-center justify-center min-h-[70vh]">
             <form
                 onSubmit={handleSubmit}
-                className="bg-[#1a1a1a] p-6 rounded-xl border border-[#ffe81f40] shadow-[0_0_20px_#ffe81f40] w-full max-w-sm space-y-4"
+                className="bg-[#1a1a1a] p-12 rounded-xl border border-[#ffe81f40] shadow-[0_0_20px_#ffe81f40] w-full max-w-sm space-y-4"
             >
                 <h2 className="text-2xl font-bold text-center text-[#ffe81f] mb-4">
-                    Login to the Star Wars Database
+                    Login to the Star Wars
                 </h2>
 
                 <input
